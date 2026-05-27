@@ -1,121 +1,198 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useEffect, useState } from 'react'
+import type { Session } from '@supabase/supabase-js'
+import { useMutation, useQuery } from '@tanstack/react-query'
+
 import './App.css'
+import { getCurrentUser } from './services/api'
+import { supabase } from './lib/supabase'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [session, setSession] = useState<Session | null>(null)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [authMessage, setAuthMessage] = useState('')
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session)
+    })
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession)
+      setAuthMessage('')
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const currentUserQuery = useQuery({
+    queryKey: ['current-user', session?.access_token],
+    queryFn: () => getCurrentUser(session?.access_token ?? ''),
+    enabled: Boolean(session?.access_token),
+  })
+
+  const signInMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (error) {
+        throw error
+      }
+    },
+    onSuccess: () => {
+      setAuthMessage('Signed in successfully.')
+      setPassword('')
+    },
+    onError: (error) => {
+      setAuthMessage(error.message)
+    },
+  })
+
+  const signUpMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+      })
+
+      if (error) {
+        throw error
+      }
+    },
+    onSuccess: () => {
+      setAuthMessage('Account created. Check your email if confirmation is enabled.')
+      setPassword('')
+    },
+    onError: (error) => {
+      setAuthMessage(error.message)
+    },
+  })
+
+  const signOutMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.auth.signOut()
+
+      if (error) {
+        throw error
+      }
+    },
+    onSuccess: () => {
+      setAuthMessage('Signed out.')
+    },
+    onError: (error) => {
+      setAuthMessage(error.message)
+    },
+  })
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <main className="app-shell">
+      <section className="auth-panel" aria-labelledby="auth-title">
+        <div className="section-heading">
+          <p>Nooler</p>
+          <h1 id="auth-title">AI workspace auth check</h1>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
+
+        {session ? (
+          <div className="stack">
+            <div className="status-card success">
+              <span>Supabase session</span>
+              <strong>{session.user.email}</strong>
+            </div>
+
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => signOutMutation.mutate()}
+              disabled={signOutMutation.isPending}
+            >
+              {signOutMutation.isPending ? 'Signing out...' : 'Sign out'}
+            </button>
+          </div>
+        ) : (
+          <form
+            className="stack"
+            onSubmit={(event) => {
+              event.preventDefault()
+              signInMutation.mutate()
+            }}
+          >
+            <label>
+              Email
+              <input
+                autoComplete="email"
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="you@example.com"
+                required
+                type="email"
+                value={email}
+              />
+            </label>
+
+            <label>
+              Password
+              <input
+                autoComplete="current-password"
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="Your Supabase password"
+                required
+                type="password"
+                value={password}
+              />
+            </label>
+
+            <button
+              type="submit"
+              className="primary-button"
+              disabled={signInMutation.isPending || signUpMutation.isPending}
+            >
+              {signInMutation.isPending ? 'Signing in...' : 'Sign in'}
+            </button>
+
+            <button
+              type="button"
+              className="secondary-button"
+              disabled={signInMutation.isPending || signUpMutation.isPending}
+              onClick={() => signUpMutation.mutate()}
+            >
+              {signUpMutation.isPending ? 'Creating account...' : 'Create account'}
+            </button>
+          </form>
+        )}
+
+        {authMessage ? <p className="message">{authMessage}</p> : null}
       </section>
 
-      <div className="ticks"></div>
+      <section className="auth-panel" aria-labelledby="backend-title">
+        <div className="section-heading">
+          <p>Backend</p>
+          <h2 id="backend-title">/auth/me verification</h2>
+        </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
+        {!session ? (
+          <p className="muted">Sign in to call the protected backend route.</p>
+        ) : currentUserQuery.isLoading ? (
+          <p className="muted">Checking backend session...</p>
+        ) : currentUserQuery.isError ? (
+          <div className="status-card error">
+            <span>Verification failed</span>
+            <strong>{currentUserQuery.error.message}</strong>
+          </div>
+        ) : currentUserQuery.data ? (
+          <div className="stack">
+            <div className="status-card success">
+              <span>Backend verified user</span>
+              <strong>{currentUserQuery.data.email ?? currentUserQuery.data.id}</strong>
+            </div>
+            <pre>{JSON.stringify(currentUserQuery.data, null, 2)}</pre>
+          </div>
+        ) : null}
       </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    </main>
   )
 }
 
