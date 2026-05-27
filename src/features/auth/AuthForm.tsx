@@ -2,8 +2,9 @@ import { useState } from 'react'
 
 import { useMutation } from '@tanstack/react-query'
 
-import { Button } from '../../components/Button'
-import { Field } from '../../components/Field'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { supabase } from '../../lib/supabase'
 
 type AuthFormProps = {
@@ -64,27 +65,33 @@ export function AuthForm({ onMessageChange }: AuthFormProps) {
         signInMutation.mutate()
       }}
     >
-      <Field
-        autoComplete="email"
-        label="Email"
-        onChange={(event) => setEmail(event.target.value)}
-        placeholder="you@example.com"
-        required
-        type="email"
-        value={email}
-      />
+      <div className="field-stack">
+        <Label htmlFor="email">Email</Label>
+        <Input
+          autoComplete="email"
+          id="email"
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="you@example.com"
+          required
+          type="email"
+          value={email}
+        />
+      </div>
 
-      <Field
-        autoComplete="current-password"
-        label="Password"
-        onChange={(event) => setPassword(event.target.value)}
-        placeholder="Your Supabase password"
-        required
-        type="password"
-        value={password}
-      />
+      <div className="field-stack">
+        <Label htmlFor="password">Password</Label>
+        <Input
+          autoComplete="current-password"
+          id="password"
+          onChange={(event) => setPassword(event.target.value)}
+          placeholder="Your Supabase password"
+          required
+          type="password"
+          value={password}
+        />
+      </div>
 
-      <Button type="submit" disabled={authIsPending}>
+      <Button type="submit" disabled={authIsPending} size="lg">
         {signInMutation.isPending ? 'Signing in...' : 'Sign in'}
       </Button>
 
@@ -92,6 +99,7 @@ export function AuthForm({ onMessageChange }: AuthFormProps) {
         type="button"
         disabled={authIsPending}
         onClick={() => signUpMutation.mutate()}
+        size="lg"
         variant="secondary"
       >
         {signUpMutation.isPending ? 'Creating account...' : 'Create account'}
@@ -99,4 +107,3 @@ export function AuthForm({ onMessageChange }: AuthFormProps) {
     </form>
   )
 }
-

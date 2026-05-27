@@ -1,7 +1,8 @@
 import type { Session } from '@supabase/supabase-js'
 import { useQuery } from '@tanstack/react-query'
 
-import { StatusCard } from '../../components/StatusCard'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getCurrentUser } from '../../services/api'
 
 type BackendAuthCheckProps = {
@@ -27,18 +28,23 @@ export function BackendAuthCheck({ session }: BackendAuthCheckProps) {
       ) : currentUserQuery.isLoading ? (
         <p className="muted">Checking backend session...</p>
       ) : currentUserQuery.isError ? (
-        <StatusCard label="Verification failed" tone="error">
-          {currentUserQuery.error.message}
-        </StatusCard>
+        <Alert variant="destructive">
+          <AlertTitle>Verification failed</AlertTitle>
+          <AlertDescription>{currentUserQuery.error.message}</AlertDescription>
+        </Alert>
       ) : currentUserQuery.data ? (
         <div className="stack">
-          <StatusCard label="Backend verified user">
-            {currentUserQuery.data.email ?? currentUserQuery.data.id}
-          </StatusCard>
+          <Card>
+            <CardHeader>
+              <CardTitle>Backend verified user</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <strong>{currentUserQuery.data.email ?? currentUserQuery.data.id}</strong>
+            </CardContent>
+          </Card>
           <pre>{JSON.stringify(currentUserQuery.data, null, 2)}</pre>
         </div>
       ) : null}
     </section>
   )
 }
-

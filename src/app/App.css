@@ -49,84 +49,18 @@
 }
 
 label {
+  color: var(--text-strong);
+}
+
+.field-stack {
   display: grid;
   gap: 8px;
-  color: var(--text-strong);
-  font-size: 14px;
-  font-weight: 700;
-}
-
-input {
-  width: 100%;
-  box-sizing: border-box;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 13px 14px;
-  color: var(--text-strong);
-  background: var(--surface-raised);
-  font: inherit;
-}
-
-button {
-  min-height: 46px;
-  border: 0;
-  border-radius: 8px;
-  padding: 0 18px;
-  font: inherit;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.primary-button {
-  color: #ffffff;
-  background: #111827;
-}
-
-.secondary-button {
-  color: var(--text-strong);
-  background: var(--surface-raised);
-  border: 1px solid var(--border);
 }
 
 .message,
 .muted {
   margin: 0;
   color: var(--muted);
-}
-
-.status-card {
-  display: grid;
-  gap: 6px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 16px;
-  background: var(--surface-raised);
-}
-
-.status-card span {
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.status-card strong {
-  overflow-wrap: anywhere;
-  color: var(--text-strong);
-}
-
-.status-card.success {
-  border-color: rgba(20, 184, 166, 0.35);
-}
-
-.status-card.error {
-  border-color: rgba(239, 68, 68, 0.4);
 }
 
 pre {

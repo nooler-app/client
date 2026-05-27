@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { useMutation } from '@tanstack/react-query'
 
-import { Button } from '../../components/Button'
-import { StatusCard } from '../../components/StatusCard'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { supabase } from '../../lib/supabase'
 import { AuthForm } from './AuthForm'
 import { BackendAuthCheck } from './BackendAuthCheck'
@@ -53,7 +54,14 @@ export function AuthPage() {
 
         {session ? (
           <div className="stack">
-            <StatusCard label="Supabase session">{session.user.email}</StatusCard>
+            <Card>
+              <CardHeader>
+                <CardTitle>Supabase session</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <strong>{session.user.email}</strong>
+              </CardContent>
+            </Card>
 
             <Button
               type="button"
@@ -68,11 +76,15 @@ export function AuthPage() {
           <AuthForm onMessageChange={setAuthMessage} />
         )}
 
-        {authMessage ? <p className="message">{authMessage}</p> : null}
+        {authMessage ? (
+          <Alert>
+            <AlertTitle>Status</AlertTitle>
+            <AlertDescription>{authMessage}</AlertDescription>
+          </Alert>
+        ) : null}
       </section>
 
       <BackendAuthCheck session={session} />
     </main>
   )
 }
-
