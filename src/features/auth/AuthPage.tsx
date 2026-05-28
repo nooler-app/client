@@ -13,24 +13,23 @@ export function AuthPage() {
   const [session, setSession] = useState<Session | null>(null)
   const [authMessage, setAuthMessage] = useState('')
 
- useEffect(() => {
-  async function loadSession() {
-    const { data } = await supabase.auth.getSession()
-    setSession(data.session)
-  }
+  useEffect(() => {
+    async function loadSession() {
+      const { data } = await supabase.auth.getSession()
+      setSession(data.session)
+    }
 
-  loadSession()
+    loadSession()
 
-  const {
-    data: { subscription },
-  } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-    setSession(nextSession)
-    setAuthMessage('')
-  })
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession)
+      setAuthMessage('')
+    })
 
-  return () => subscription.unsubscribe()
-}, [])
-
+    return () => subscription.unsubscribe()
+  }, [])
 
   const signOutMutation = useSignOutMutation({ onMessageChange: setAuthMessage })
 

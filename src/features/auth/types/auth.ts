@@ -8,4 +8,3 @@ export type CurrentUser = {
   email: string | null
   role: string | null
 }
-

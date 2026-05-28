@@ -19,4 +19,3 @@ export const env: ClientEnv = {
   supabaseAnonKey: readRequiredEnv('VITE_SUPABASE_ANON_KEY'),
   supabaseUrl: readRequiredEnv('VITE_SUPABASE_URL'),
 }
-
