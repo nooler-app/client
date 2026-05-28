@@ -14,23 +14,13 @@ export function AuthForm({ onMessageChange }: AuthFormProps) {
   const [password, setPassword] = useState('')
 
   const signInMutation = useSignInMutation({
-    onSuccess: () => {
-      onMessageChange('Signed in successfully.')
-      setPassword('')
-    },
-    onError: (error) => {
-      onMessageChange(error.message)
-    },
+    onMessageChange,
+    onPasswordReset: () => setPassword(''),
   })
 
   const signUpMutation = useSignUpMutation({
-    onSuccess: () => {
-      onMessageChange('Account created. Check your email if confirmation is enabled.')
-      setPassword('')
-    },
-    onError: (error) => {
-      onMessageChange(error.message)
-    },
+    onMessageChange,
+    onPasswordReset: () => setPassword(''),
   })
 
   const authIsPending = signInMutation.isPending || signUpMutation.isPending

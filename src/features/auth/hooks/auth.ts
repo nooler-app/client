@@ -17,35 +17,53 @@ export function useCurrentUserQuery(session: Session | null) {
   })
 }
 
-export function useSignInMutation(options?: {
-  onError?: (error: Error) => void
-  onSuccess?: () => void
-}) {
+type AuthMutationOptions = {
+  onMessageChange: (message: string) => void
+  onPasswordReset?: () => void
+}
+
+export function useSignInMutation({
+  onMessageChange,
+  onPasswordReset,
+}: AuthMutationOptions) {
   return useMutation({
     mutationFn: (credentials: AuthCredentials) => signInWithPassword(credentials),
-    onError: options?.onError,
-    onSuccess: options?.onSuccess,
+    onError: (error) => {
+      onMessageChange(error.message)
+    },
+    onSuccess: () => {
+      onMessageChange('Signed in successfully.')
+      onPasswordReset?.()
+    },
   })
 }
 
-export function useSignUpMutation(options?: {
-  onError?: (error: Error) => void
-  onSuccess?: () => void
-}) {
+export function useSignUpMutation({
+  onMessageChange,
+  onPasswordReset,
+}: AuthMutationOptions) {
   return useMutation({
     mutationFn: (credentials: AuthCredentials) => signUpWithPassword(credentials),
-    onError: options?.onError,
-    onSuccess: options?.onSuccess,
+    onError: (error) => {
+      onMessageChange(error.message)
+    },
+    onSuccess: () => {
+      onMessageChange('Account created. Check your email if confirmation is enabled.')
+      onPasswordReset?.()
+    },
   })
 }
 
-export function useSignOutMutation(options?: {
-  onError?: (error: Error) => void
-  onSuccess?: () => void
-}) {
+export function useSignOutMutation({
+  onMessageChange,
+}: Pick<AuthMutationOptions, 'onMessageChange'>) {
   return useMutation({
     mutationFn: signOut,
-    onError: options?.onError,
-    onSuccess: options?.onSuccess,
+    onError: (error) => {
+      onMessageChange(error.message)
+    },
+    onSuccess: () => {
+      onMessageChange('Signed out.')
+    },
   })
 }
