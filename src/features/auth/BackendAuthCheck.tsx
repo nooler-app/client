@@ -1,20 +1,15 @@
 import type { Session } from '@supabase/supabase-js'
-import { useQuery } from '@tanstack/react-query'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { getCurrentUser } from '../../services/api'
+import { useCurrentUserQuery } from './hooks/auth'
 
 type BackendAuthCheckProps = {
   session: Session | null
 }
 
 export function BackendAuthCheck({ session }: BackendAuthCheckProps) {
-  const currentUserQuery = useQuery({
-    queryKey: ['current-user', session?.access_token],
-    queryFn: () => getCurrentUser(session?.access_token ?? ''),
-    enabled: Boolean(session?.access_token),
-  })
+  const currentUserQuery = useCurrentUserQuery(session)
 
   return (
     <section className="auth-panel" aria-labelledby="backend-title">

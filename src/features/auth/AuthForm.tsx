@@ -1,11 +1,9 @@
 import { useState } from 'react'
 
-import { useMutation } from '@tanstack/react-query'
-
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { supabase } from '../../lib/supabase'
+import { useSignInMutation, useSignUpMutation } from './hooks/auth'
 
 type AuthFormProps = {
   onMessageChange: (message: string) => void
@@ -15,17 +13,7 @@ export function AuthForm({ onMessageChange }: AuthFormProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  const signInMutation = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (error) {
-        throw error
-      }
-    },
+  const signInMutation = useSignInMutation({
     onSuccess: () => {
       onMessageChange('Signed in successfully.')
       setPassword('')
@@ -35,17 +23,7 @@ export function AuthForm({ onMessageChange }: AuthFormProps) {
     },
   })
 
-  const signUpMutation = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      })
-
-      if (error) {
-        throw error
-      }
-    },
+  const signUpMutation = useSignUpMutation({
     onSuccess: () => {
       onMessageChange('Account created. Check your email if confirmation is enabled.')
       setPassword('')
@@ -62,7 +40,7 @@ export function AuthForm({ onMessageChange }: AuthFormProps) {
       className="stack"
       onSubmit={(event) => {
         event.preventDefault()
-        signInMutation.mutate()
+        signInMutation.mutate({ email, password })
       }}
     >
       <div className="field-stack">
@@ -98,7 +76,7 @@ export function AuthForm({ onMessageChange }: AuthFormProps) {
       <Button
         type="button"
         disabled={authIsPending}
-        onClick={() => signUpMutation.mutate()}
+        onClick={() => signUpMutation.mutate({ email, password })}
         size="lg"
         variant="secondary"
       >

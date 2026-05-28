@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { useMutation } from '@tanstack/react-query'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { supabase } from '../../lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { AuthForm } from './AuthForm'
 import { BackendAuthCheck } from './BackendAuthCheck'
+import { useSignOutMutation } from './hooks/auth'
 
 export function AuthPage() {
   const [session, setSession] = useState<Session | null>(null)
@@ -28,14 +28,7 @@ export function AuthPage() {
     return () => subscription.unsubscribe()
   }, [])
 
-  const signOutMutation = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.auth.signOut()
-
-      if (error) {
-        throw error
-      }
-    },
+  const signOutMutation = useSignOutMutation({
     onSuccess: () => {
       setAuthMessage('Signed out.')
     },
