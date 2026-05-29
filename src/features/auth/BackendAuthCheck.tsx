@@ -1,7 +1,7 @@
 import type { Session } from '@supabase/supabase-js'
+import { Server, ShieldAlert, ShieldCheck } from 'lucide-react'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useCurrentUserQuery } from './hooks/auth'
 
 type BackendAuthCheckProps = {
@@ -12,32 +12,50 @@ export function BackendAuthCheck({ session }: BackendAuthCheckProps) {
   const currentUserQuery = useCurrentUserQuery(session)
 
   return (
-    <section className="auth-panel" aria-labelledby="backend-title">
-      <div className="section-heading">
-        <p>Backend</p>
-        <h2 id="backend-title">/auth/me verification</h2>
-      </div>
-
+    <section className="backend-panel" aria-labelledby="backend-title">
       {!session ? (
-        <p className="muted">Sign in to call the protected backend route.</p>
+        <div className="status-row">
+          <div>
+            <p className="muted">Backend verification</p>
+            <strong id="backend-title">Waiting for sign in</strong>
+          </div>
+          <span className="status-badge">
+            <Server size={14} aria-hidden="true" />
+            Idle
+          </span>
+        </div>
       ) : currentUserQuery.isLoading ? (
-        <p className="muted">Checking backend session...</p>
+        <div className="status-row">
+          <div>
+            <p className="muted">Backend verification</p>
+            <strong id="backend-title">Checking session</strong>
+          </div>
+          <span className="status-badge">
+            <Server size={14} aria-hidden="true" />
+            Syncing
+          </span>
+        </div>
       ) : currentUserQuery.isError ? (
         <Alert variant="destructive">
-          <AlertTitle>Verification failed</AlertTitle>
+          <ShieldAlert aria-hidden="true" />
+          <AlertTitle id="backend-title">Verification failed</AlertTitle>
           <AlertDescription>{currentUserQuery.error.message}</AlertDescription>
         </Alert>
       ) : currentUserQuery.data ? (
-        <div className="stack">
-          <Card>
-            <CardHeader>
-              <CardTitle>Backend verified user</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <strong>{currentUserQuery.data.email ?? currentUserQuery.data.id}</strong>
-            </CardContent>
-          </Card>
-          <pre>{JSON.stringify(currentUserQuery.data, null, 2)}</pre>
+        <div>
+          <div className="status-row">
+            <div>
+              <p className="muted">Backend verified</p>
+              <strong id="backend-title">
+                {currentUserQuery.data.email ?? currentUserQuery.data.id}
+              </strong>
+            </div>
+            <span className="status-badge">
+              <ShieldCheck size={14} aria-hidden="true" />
+              Secured
+            </span>
+          </div>
+          <pre className="session-json">{JSON.stringify(currentUserQuery.data, null, 2)}</pre>
         </div>
       ) : null}
     </section>

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { LogIn, UserPlus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -59,19 +60,23 @@ export function AuthForm({ onMessageChange }: AuthFormProps) {
         />
       </div>
 
-      <Button type="submit" disabled={authIsPending} size="lg">
-        {signInMutation.isPending ? 'Signing in...' : 'Sign in'}
-      </Button>
+      <div className="auth-actions">
+        <Button type="submit" disabled={authIsPending} size="lg">
+          <LogIn aria-hidden="true" />
+          {signInMutation.isPending ? 'Signing in...' : 'Sign in'}
+        </Button>
 
-      <Button
-        type="button"
-        disabled={authIsPending}
-        onClick={() => signUpMutation.mutate({ email, password })}
-        size="lg"
-        variant="secondary"
-      >
-        {signUpMutation.isPending ? 'Creating account...' : 'Create account'}
-      </Button>
+        <Button
+          type="button"
+          disabled={authIsPending}
+          onClick={() => signUpMutation.mutate({ email, password })}
+          size="lg"
+          variant="secondary"
+        >
+          <UserPlus aria-hidden="true" />
+          {signUpMutation.isPending ? 'Creating...' : 'Create account'}
+        </Button>
+      </div>
     </form>
   )
 }
