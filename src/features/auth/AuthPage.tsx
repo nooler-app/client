@@ -1,17 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import {
-  Bot,
-  BrainCircuit,
-  CalendarCheck,
-  FileText,
-  LogOut,
-  Mail,
-  MessageSquareText,
-  Search,
-  ShieldCheck,
-  Sparkles,
-} from 'lucide-react'
+import { Bot, LogOut, ShieldCheck } from 'lucide-react'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -52,137 +41,78 @@ export function AuthPage() {
   const signOutMutation = useSignOutMutation({ onMessageChange: setAuthMessage })
 
   return (
-    <main className="app-shell">
-      <div className="auth-layout">
-        <section className="brand-panel" aria-labelledby="brand-title">
-          <div className="brand-topbar">
-            <div className="brand-mark">
-              <span className="brand-glyph">
-                <Bot size={18} aria-hidden="true" />
-              </span>
-              <span>Nooler</span>
-            </div>
-
-            <span className="edition-pill">Agent OS</span>
+    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10 text-slate-900">
+      <section className="grid w-full max-w-md gap-6" aria-labelledby="auth-title">
+        <div className="grid gap-3 text-center">
+          <div className="mx-auto grid size-11 place-items-center rounded-lg bg-slate-950 text-white">
+            <Bot size={20} aria-hidden="true" />
           </div>
-
-          <div className="brand-copy">
-            <div className="eyebrow">
-              <Sparkles size={14} aria-hidden="true" />
-              Private beta workspace
-            </div>
-            <h1 id="brand-title">Your AI workspace for thinking and doing.</h1>
-            <p>
-              Bring conversations, documents, research, email, and calendar actions into
-              one agent-powered workspace.
-            </p>
-
-            <div className="tool-strip" aria-label="Planned Nooler tools">
-              <span className="tool-pill">
-                <Mail size={15} aria-hidden="true" />
-                Email
-              </span>
-              <span className="tool-pill">
-                <CalendarCheck size={15} aria-hidden="true" />
-                Calendar
-              </span>
-              <span className="tool-pill">
-                <Search size={15} aria-hidden="true" />
-                Research
-              </span>
-              <span className="tool-pill">
-                <FileText size={15} aria-hidden="true" />
-                Documents
-              </span>
-            </div>
+          <div className="grid gap-1">
+            <p className="m-0 text-sm font-medium text-slate-500">Nooler</p>
+            <h1 className="m-0 text-2xl font-semibold tracking-tight">
+              AI workspace sign in
+            </h1>
           </div>
+          <p className="m-0 text-sm leading-6 text-slate-500">
+            Access your conversations, tools, and workspace data.
+          </p>
+        </div>
 
-          <div className="agent-visual" aria-hidden="true">
-            <div className="agent-card agent-card-main">
-              <div className="agent-card-header">
-                <span className="agent-icon">
-                  <BrainCircuit size={16} />
-                </span>
-                <span>Planner</span>
-              </div>
-              <div className="agent-lines">
-                <span />
-                <span />
-                <span />
-              </div>
-            </div>
+        <Card className="rounded-lg shadow-sm">
+          <CardHeader>
+            <CardTitle id="auth-title">
+              {session ? 'Workspace access' : 'Sign in to Nooler'}
+            </CardTitle>
+            <CardDescription>
+              {session
+                ? 'Your Supabase session is active and ready for backend requests.'
+                : 'Use your project account to continue into the AI workspace.'}
+            </CardDescription>
+          </CardHeader>
 
-            <div className="agent-card agent-card-side">
-              <div className="agent-card-header">
-                <span className="agent-icon">
-                  <MessageSquareText size={16} />
-                </span>
-                <span>Conversation</span>
-              </div>
-              <div className="agent-meter">
-                <span />
-              </div>
-            </div>
-
-            <div className="agent-node node-one" />
-            <div className="agent-node node-two" />
-            <div className="agent-node node-three" />
-          </div>
-        </section>
-
-        <section className="auth-content" aria-labelledby="auth-title">
-          <Card className="auth-card">
-            <CardHeader>
-              <CardTitle id="auth-title">
-                {session ? 'Workspace access!!!' : 'Sign in to Nooler'}
-              </CardTitle>
-              <CardDescription>
-                {session
-                  ? 'Your Supabase session is active and ready for backend requests.'
-                  : 'Use your project account to continue into the AI workspace.'}
-              </CardDescription>
-            </CardHeader>
-
-            <CardContent className="card-stack">
-              {session ? (
-                <div className="signed-in-card">
-                  <div className="user-row">
-                    <div className="user-identity">
-                      <p className="muted">Signed in as</p>
-                      <strong>{session.user.email}</strong>
-                    </div>
-                    <span className="status-badge">
-                      <ShieldCheck size={14} aria-hidden="true" />
-                      Active
-                    </span>
+          <CardContent className="grid gap-4">
+            {session ? (
+              <div className="grid gap-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="grid min-w-0 gap-0.5">
+                    <p className="m-0 text-[13px] leading-normal text-slate-500">
+                      Signed in as
+                    </p>
+                    <strong className="break-words text-sm text-slate-950">
+                      {session.user.email}
+                    </strong>
                   </div>
-
-                  <Button
-                    type="button"
-                    onClick={() => signOutMutation.mutate()}
-                    disabled={signOutMutation.isPending}
-                    variant="secondary"
-                  >
-                    <LogOut aria-hidden="true" />
-                    {signOutMutation.isPending ? 'Signing out...' : 'Sign out'}
-                  </Button>
+                  <span className="inline-flex min-h-7 items-center gap-1.5 rounded-full border border-slate-300 bg-slate-50 px-2.5 text-xs font-semibold text-slate-700">
+                    <ShieldCheck size={14} aria-hidden="true" />
+                    Active
+                  </span>
                 </div>
-              ) : (
-                <AuthForm onMessageChange={setAuthMessage} />
-              )}
 
-              {authMessage ? (
-                <Alert>
-                  <AlertTitle>Status</AlertTitle>
-                  <AlertDescription>{authMessage}</AlertDescription>
-                </Alert>
-              ) : null}
+                <Button
+                  type="button"
+                  onClick={() => signOutMutation.mutate()}
+                  disabled={signOutMutation.isPending}
+                  variant="secondary"
+                >
+                  <LogOut aria-hidden="true" />
+                  {signOutMutation.isPending ? 'Signing out...' : 'Sign out'}
+                </Button>
+              </div>
+            ) : (
+              <AuthForm onMessageChange={setAuthMessage} />
+            )}
 
-              <BackendAuthCheck session={session} />
-            </CardContent>
-          </Card>
-        </section>
-      </div>
+            {authMessage ? (
+              <Alert>
+                <AlertTitle>Status</AlertTitle>
+                <AlertDescription>{authMessage}</AlertDescription>
+              </Alert>
+            ) : null}
+
+            <BackendAuthCheck session={session} />
+          </CardContent>
+        </Card>
+      </section>
     </main>
   )
 }

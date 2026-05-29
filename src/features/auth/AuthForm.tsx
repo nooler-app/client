@@ -28,13 +28,13 @@ export function AuthForm({ onMessageChange }: AuthFormProps) {
 
   return (
     <form
-      className="stack"
+      className="grid gap-3.5"
       onSubmit={(event) => {
         event.preventDefault()
         signInMutation.mutate({ email, password })
       }}
     >
-      <div className="field-stack">
+      <div className="grid gap-2">
         <Label htmlFor="email">Email</Label>
         <Input
           autoComplete="email"
@@ -47,7 +47,7 @@ export function AuthForm({ onMessageChange }: AuthFormProps) {
         />
       </div>
 
-      <div className="field-stack">
+      <div className="grid gap-2">
         <Label htmlFor="password">Password</Label>
         <Input
           autoComplete="current-password"
@@ -60,7 +60,7 @@ export function AuthForm({ onMessageChange }: AuthFormProps) {
         />
       </div>
 
-      <div className="auth-actions">
+      <div className="grid grid-cols-1 gap-2.5 pt-1 sm:grid-cols-2">
         <Button type="submit" disabled={authIsPending} size="lg">
           <LogIn aria-hidden="true" />
           {signInMutation.isPending ? 'Signing in...' : 'Sign in'}
