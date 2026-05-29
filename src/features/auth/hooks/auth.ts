@@ -1,5 +1,5 @@
 import type { Session } from '@supabase/supabase-js'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, type UseMutationOptions } from '@tanstack/react-query'
 
 import {
   getCurrentUser,
@@ -17,53 +17,25 @@ export function useCurrentUserQuery(session: Session | null) {
   })
 }
 
-type AuthMutationOptions = {
-  onMessageChange: (message: string) => void
-  onPasswordReset?: () => void
-}
+type AuthMutationOptions = UseMutationOptions<void, Error, AuthCredentials>
 
-export function useSignInMutation({
-  onMessageChange,
-  onPasswordReset,
-}: AuthMutationOptions) {
+export function useSignInMutation(options?: AuthMutationOptions) {
   return useMutation({
     mutationFn: (credentials: AuthCredentials) => signInWithPassword(credentials),
-    onError: (error) => {
-      onMessageChange(error.message)
-    },
-    onSuccess: () => {
-      onMessageChange('Signed in successfully.')
-      onPasswordReset?.()
-    },
+    ...options,
   })
 }
 
-export function useSignUpMutation({
-  onMessageChange,
-  onPasswordReset,
-}: AuthMutationOptions) {
+export function useSignUpMutation(options?: AuthMutationOptions) {
   return useMutation({
     mutationFn: (credentials: AuthCredentials) => signUpWithPassword(credentials),
-    onError: (error) => {
-      onMessageChange(error.message)
-    },
-    onSuccess: () => {
-      onMessageChange('Account created. Check your email if confirmation is enabled.')
-      onPasswordReset?.()
-    },
+    ...options,
   })
 }
 
-export function useSignOutMutation({
-  onMessageChange,
-}: Pick<AuthMutationOptions, 'onMessageChange'>) {
+export function useSignOutMutation(options?: UseMutationOptions<void, Error, void>) {
   return useMutation({
     mutationFn: signOut,
-    onError: (error) => {
-      onMessageChange(error.message)
-    },
-    onSuccess: () => {
-      onMessageChange('Signed out.')
-    },
+    ...options,
   })
 }

@@ -38,7 +38,14 @@ export function AuthPage() {
     return () => subscription.unsubscribe()
   }, [])
 
-  const signOutMutation = useSignOutMutation({ onMessageChange: setAuthMessage })
+  const signOutMutation = useSignOutMutation({
+    onError: (error) => {
+      setAuthMessage(error.message)
+    },
+    onSuccess: () => {
+      setAuthMessage('Signed out.')
+    },
+  })
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10 text-slate-900">
